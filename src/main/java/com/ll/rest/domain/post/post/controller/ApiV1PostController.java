@@ -24,8 +24,11 @@ public class ApiV1PostController {
     private final PostService postService;
 
     @GetMapping
-    public List<Post> getItems() {
-        return postService.findAllByOrderByIdDesc();
+    public List<PostDto> getItems() {
+        return postService.findAllByOrderByIdDesc()
+                .stream()
+                .map(PostDto::new)
+                .toList();
     }
 
     @GetMapping("/{id}")
