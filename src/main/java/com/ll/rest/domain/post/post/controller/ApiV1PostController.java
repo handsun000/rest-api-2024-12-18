@@ -43,7 +43,7 @@ public class ApiV1PostController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(
+    public ResponseEntity<RsData<Void>> deleteItem(
             @PathVariable long id
     ) {
         Post post = postService.findById(id).get();
@@ -51,8 +51,13 @@ public class ApiV1PostController {
         postService.delete(post);
 
         return ResponseEntity
-                .noContent()
-                .build();
+                .status(HttpStatus.OK)
+                .body(
+                        new RsData<>(
+                                "200-1",
+                                "%d번 글이 삭제되었습니다.".formatted(id)
+                        )
+                );
     }
 
     record PostModifyReqBody(
