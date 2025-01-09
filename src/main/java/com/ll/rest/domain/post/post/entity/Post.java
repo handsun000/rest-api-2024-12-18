@@ -1,6 +1,5 @@
 package com.ll.rest.domain.post.post.entity;
 
-import com.ll.rest.global.jpa.entity.BaseEntity;
 import com.ll.rest.global.jpa.entity.BaseTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Post extends BaseEntity {
+public class Post extends BaseTime {
     @Column(length = 100)
     private String title;
 

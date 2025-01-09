@@ -1,6 +1,7 @@
 
 package com.ll.rest.global.baseInit;
 
+import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ public class BaseInitData {
     @Lazy
     private BaseInitData self;
 
-    private PostService postService;
+    private final PostService postService;
 
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
@@ -30,8 +31,8 @@ public class BaseInitData {
     public void work1() {
         if (postService.count() > 0) return;
 
-        postService.write("축구 하실 분?", "14시 까지 22명을 모아야 합니다.");
-        postService.write("배구 하실 분?", "15시 까지 23명을 모아야 합니다.");
-        postService.write("농구 하실 분?", "16시 까지 24명을 모아야 합니다.");
+        Post post1 = postService.write("축구 하실 분?", "14시 까지 22명을 모아야 합니다.");
+        Post post2 = postService.write("배구 하실 분?", "15시 까지 12명을 모아야 합니다.");
+        Post post3 = postService.write("농구 하실 분?", "16시 까지 10명을 모아야 합니다.");
     }
 }
