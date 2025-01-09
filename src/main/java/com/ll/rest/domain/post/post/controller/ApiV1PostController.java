@@ -41,14 +41,14 @@ public class ApiV1PostController {
     }
 
     @DeleteMapping("/{id}")
-    public RsData deleteItem(
+    public RsData<Void> deleteItem(
             @PathVariable long id
     ) {
         Post post = postService.findById(id).get();
 
         postService.delete(post);
 
-        return new RsData(
+        return new RsData<>(
                 "200-1",
                 "%d번 글이 삭제되었습니다.".formatted(id)
         );
