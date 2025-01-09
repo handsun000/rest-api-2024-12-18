@@ -77,7 +77,8 @@ public class ApiV1PostController {
 
         return new RsData(
                 "200-1",
-                "%d번 글이 수정되었습니다.".formatted(id)
+                "%d번 글이 수정되었습니다.".formatted(id),
+                new PostDto(post)
         );
     }
 
@@ -101,7 +102,7 @@ public class ApiV1PostController {
         return new RsData(
                 "200-1",
                 "%d번 글이 작성되었습니다.".formatted(post.getId()),
-                post.getId()
+                new PostDto(post)
         );
     }
 }

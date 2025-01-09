@@ -10,7 +10,7 @@ import lombok.Getter;
 public class RsData {
     private String resultCode;
     private String msg;
-    private Long id;
+    private Object data;
 
 
     public RsData(String resultCode, String msg) {
