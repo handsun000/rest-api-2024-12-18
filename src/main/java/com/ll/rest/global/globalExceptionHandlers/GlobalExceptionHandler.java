@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,15 +31,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RsData<Void>> handle(MethodArgumentNotValidException ex) {
-
+        FieldError fieldError = ex.getBindingResult().getFieldError();
+        String field = fieldError.getField();
         String message = ex.getBindingResult().getFieldError().getDefaultMessage();
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(
                         new RsData<>(
+
                                 "400-1",
-                                message
+                                field+" : "+message
                         ));
     }
 }
