@@ -58,8 +58,8 @@ public class GlobalExceptionHandler {
                                 message
                         ));
     }
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<RsData<Void>> handle(DataIntegrityViolationException ex) {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<RsData<Void>> handle(IllegalArgumentException ex) {
 
         if (AppConfig.isNotProd()) ex.printStackTrace();
 
@@ -68,7 +68,7 @@ public class GlobalExceptionHandler {
                 .body(
                         new RsData<>(
                                 "400-1",
-                                "이미 존재하는 데이터 입니다."
+                                ex.getMessage()
                         ));
     }
 }
