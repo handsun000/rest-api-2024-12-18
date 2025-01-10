@@ -10,7 +10,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Comparator;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 @RequiredArgsConstructor
@@ -31,9 +33,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RsData<Void>> handle(MethodArgumentNotValidException ex) {
-        FieldError fieldError = ex.getBindingResult().getFieldError();
-        String field = fieldError.getField();
-        String message = ex.getBindingResult().getFieldError().getDefaultMessage();
+        String message = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .filter(error -> error instanceof FieldError)
+                .map(error -> (FieldError) error)
+                .map(error -> error.getField() + "-" + error.getCode() + "-" + error.getDefaultMessage())
+                .sorted(Comparator.comparing(String::toString))
+                .collect(Collectors.joining("\n"));
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -41,7 +48,7 @@ public class GlobalExceptionHandler {
                         new RsData<>(
 
                                 "400-1",
-                                field+" : "+message
+                                message
                         ));
     }
 }
