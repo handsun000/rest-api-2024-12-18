@@ -27,6 +27,7 @@ public class BaseInitData {
     public ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
             self.work1();
+            self.work2();
         };
     }
 
@@ -45,8 +46,11 @@ public class BaseInitData {
     public void work2() {
         if (postService.count() > 0) return;
 
-        Post post1 = postService.write("축구 하실 분?", "14시 까지 22명을 모아야 합니다.");
-        Post post2 = postService.write("배구 하실 분?", "15시 까지 12명을 모아야 합니다.");
-        Post post3 = postService.write("농구 하실 분?", "16시 까지 10명을 모아야 합니다.");
+        Member user1 = memberService.findByUsername("user1").get();
+        Member user2 = memberService.findByUsername("user2").get();
+
+        Post post1 = postService.write(user1,"축구 하실 분?", "14시 까지 22명을 모아야 합니다.");
+        Post post2 = postService.write(user1, "배구 하실 분?", "15시 까지 12명을 모아야 합니다.");
+        Post post3 = postService.write(user2, "농구 하실 분?", "16시 까지 10명을 모아야 합니다.");
     }
 }

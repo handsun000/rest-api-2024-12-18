@@ -1,9 +1,14 @@
 package com.ll.rest.domain.member.member.entity;
 
+import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.global.jpa.entity.BaseTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -12,6 +17,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member extends BaseTime {
+
     @Column(unique = true, length = 30)
     private String username;
 

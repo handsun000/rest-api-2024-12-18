@@ -1,5 +1,6 @@
 package com.ll.rest.domain.post.post.service;
 
+import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,11 @@ public class PostService {
         return postRepository.count();
     }
 
-    public Post write(String title, String content) {
+    public Post write(Member member, String title, String content) {
         Post post = Post.builder()
                 .title(title)
                 .content(content)
+                .author(member)
                 .build();
 
         return postRepository.save(post);
