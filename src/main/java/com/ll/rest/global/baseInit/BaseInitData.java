@@ -1,6 +1,8 @@
 
 package com.ll.rest.global.baseInit;
 
+import com.ll.rest.domain.member.member.entity.Member;
+import com.ll.rest.domain.member.member.service.MemberService;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class BaseInitData {
     private BaseInitData self;
 
     private final PostService postService;
+    private final MemberService memberService;
 
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
@@ -29,6 +32,17 @@ public class BaseInitData {
 
     @Transactional
     public void work1() {
+        if (memberService.count() > 0) return;
+
+        Member memberSystem = memberService.join("system", "1234", "시스템");
+        Member memberAdmin = memberService.join("admin", "1234", "관리자");
+        Member memberUser1 = memberService.join("user1", "1234", "유저1");
+        Member memberUser2 = memberService.join("user2", "1234", "유저2");
+        Member memberUser3 = memberService.join("user3", "1234", "유저3");
+    }
+
+    @Transactional
+    public void work2() {
         if (postService.count() > 0) return;
 
         Post post1 = postService.write("축구 하실 분?", "14시 까지 22명을 모아야 합니다.");
