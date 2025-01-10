@@ -1,5 +1,6 @@
 package com.ll.rest.global.globalExceptionHandlers;
 
+import com.ll.rest.global.app.AppConfig;
 import com.ll.rest.global.rsData.RsData;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<RsData<Void>> handle(NoSuchElementException ex) {
 
+        ex.printStackTrace();
+
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(
@@ -33,6 +36,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RsData<Void>> handle(MethodArgumentNotValidException ex) {
+
+        if (AppConfig.isNotProd()) ex.printStackTrace();
+
         String message = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
