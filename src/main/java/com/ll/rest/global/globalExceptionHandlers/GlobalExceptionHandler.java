@@ -1,6 +1,7 @@
 package com.ll.rest.global.globalExceptionHandlers;
 
 import com.ll.rest.global.app.AppConfig;
+import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rsData.RsData;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -58,17 +59,15 @@ public class GlobalExceptionHandler {
                                 message
                         ));
     }
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<RsData<Void>> handle(IllegalArgumentException ex) {
+    @ExceptionHandler(ServiceException.class)
+    public ResponseEntity<RsData<Void>> handle(ServiceException ex) {
 
         if (AppConfig.isNotProd()) ex.printStackTrace();
 
+        RsData<Void> rsData = ex.getRsData();
+
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        new RsData<>(
-                                "400-1",
-                                ex.getMessage()
-                        ));
+                .status(rsData.getStatusCode())
+                .body(rsData);
     }
 }
