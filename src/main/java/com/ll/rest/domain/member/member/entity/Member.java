@@ -26,4 +26,8 @@ public class Member extends BaseTime {
 
     @Column(length = 30)
     private String nickname;
+
+    public String getName() {
+        return this.nickname;
+    }
 }

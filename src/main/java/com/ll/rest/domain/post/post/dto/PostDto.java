@@ -14,7 +14,8 @@ public class PostDto {
     private LocalDateTime createDate;
     @JsonProperty("modifiedDatetime")
     private LocalDateTime modifyDate;
-    private MemberDto memberDto;
+    private long authorId;
+    private String authorName;
     private String title;
     private String content;
 
@@ -22,7 +23,8 @@ public class PostDto {
         this.id = post.getId();
         this.createDate = post.getCreateDate();
         this.modifyDate = post.getModifyDate();
-        this.memberDto = new MemberDto(post.getAuthor());
+        this.authorId = post.getAuthor().getId();
+        this.authorName = post.getAuthor().getName();
         this.title = post.getTitle();
         this.content = post.getContent();
     }
