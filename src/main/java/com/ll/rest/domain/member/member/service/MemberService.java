@@ -6,7 +6,7 @@ import com.ll.rest.global.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import javax.swing.text.html.Option;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,5 +43,9 @@ public class MemberService {
 
     public Optional<Member> findById(long authorId) {
         return memberRepository.findById(authorId);
+    }
+
+    public Optional<Member> findByPassword2(String password2) {
+        return memberRepository.findByPassword2(password2);
     }
 }
