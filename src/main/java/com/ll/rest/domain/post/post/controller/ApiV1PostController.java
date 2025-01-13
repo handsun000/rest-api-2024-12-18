@@ -7,6 +7,8 @@ import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.service.PostService;
 import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rsData.RsData;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +31,7 @@ public class ApiV1PostController {
 
     private final PostService postService;
     private final MemberService memberService;
+    private final HttpServletRequest request;
 
     @GetMapping
     public List<PostDto> getItems() {
@@ -49,10 +52,9 @@ public class ApiV1PostController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<RsData<Void>> deleteItem(
-            @PathVariable long id,
-            @RequestHeader("Authorization") String credentials
+            @PathVariable long id
     ) {
-        Member actor = checkAuthentication(credentials);
+        Member actor = checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -85,10 +87,9 @@ public class ApiV1PostController {
     @Transactional
     public RsData<PostDto> modifyItem(
             @PathVariable long id,
-            @RequestBody @Valid PostModifyReqBody reqBody,
-            @RequestHeader("Authorization") String credentials
+            @RequestBody @Valid PostModifyReqBody reqBody
     ) {
-        Member actor = checkAuthentication(credentials);
+        Member actor = checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -116,10 +117,9 @@ public class ApiV1PostController {
 
     @PostMapping()
     public RsData<PostDto> writeItem(
-            @RequestBody @Valid PostWriteReqBody reqBody,
-            @RequestHeader("Authorization") String credentials
+            @RequestBody @Valid PostWriteReqBody reqBody
     ) {
-        Member actor = checkAuthentication(credentials);
+        Member actor = checkAuthentication();
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
@@ -130,7 +130,8 @@ public class ApiV1PostController {
         );
     }
 
-    private Member checkAuthentication(String credentials) {
+    private Member checkAuthentication() {
+        String credentials = request.getHeader("Authorization");
         credentials = credentials.substring("Bearer ".length());
         String[] credentialsBits  = credentials.split("/",2);
         long actorId = Long.parseLong(credentialsBits[0]);
