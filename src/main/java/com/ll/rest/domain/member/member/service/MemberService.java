@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class MemberService {
                 .username(username)
                 .password(password)
                 .nickname(nickname)
+                .password2(UUID.randomUUID().toString())
                 .build();
 
         return memberRepository.save(member);
