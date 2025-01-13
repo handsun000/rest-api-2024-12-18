@@ -5,6 +5,7 @@ import com.ll.rest.domain.member.member.service.MemberService;
 import com.ll.rest.domain.post.post.dto.PostDto;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.service.PostService;
+import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rsData.RsData;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -100,35 +101,28 @@ public class ApiV1PostController {
             @Length(min = 2)
             String content,
             @NotNull
-            Long authorId
-    ) {
-
-    }
-
-    record PostWriteResBody(
-            PostDto postDto,
-            long count
+            Long authorId,
+            @NotNull
+            String password
     ) {
 
     }
 
     @PostMapping()
-    public ResponseEntity<RsData<PostWriteResBody>> writeItem(
+    public RsData<PostDto> writeItem(
             @RequestBody @Valid PostWriteReqBody reqBody
     ) {
         Member actor = memberService.findById(reqBody.authorId).get();
 
+        //인증체크
+        if (!actor.getPassword().equals(reqBody.password)) throw new ServiceException("403-1", "인증에 실패하였습니다.");
+
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(new RsData<>(
+        return new RsData<>(
                         "201-1",
                         "%d번 글이 작성되었습니다.".formatted(post.getId()),
-                        new PostWriteResBody(
-                                new PostDto(post),
-                                postService.count()
-                        ))
-        );
+                        new PostDto(post)
+               );
     }
 }
