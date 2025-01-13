@@ -49,9 +49,17 @@ public class ApiV1PostController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<RsData<Void>> deleteItem(
-            @PathVariable long id
+            @PathVariable long id,
+            @RequestHeader("actorId") long actorId,
+            @RequestHeader("password") String password
     ) {
+        Member actor = memberService.findById(actorId).get();
+
+        if (!actor.getPassword().equals(password)) throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
+
         Post post = postService.findById(id).get();
+
+        if (!post.getAuthor().equals(actor)) throw new ServiceException("403-1", "작성자만 글을 삭제할 권한이 있습니다.");
 
         postService.delete(post);
 
@@ -92,7 +100,7 @@ public class ApiV1PostController {
 
         Post post = postService.findById(id).get();
 
-        if (post.getAuthor().equals(author)) throw new ServiceException("403-1", "작성자만 글을 수정할 권한이 있습니다.");
+        if (!post.getAuthor().equals(author)) throw new ServiceException("403-1", "작성자만 글을 수정할 권한이 있습니다.");
 
         postService.modify(post, reqBody.title, reqBody.content);
 
