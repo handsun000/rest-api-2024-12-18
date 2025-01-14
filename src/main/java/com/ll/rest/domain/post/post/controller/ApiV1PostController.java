@@ -6,6 +6,7 @@ import com.ll.rest.domain.post.post.dto.PostDto;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.service.PostService;
 import com.ll.rest.global.exception.ServiceException;
+import com.ll.rest.global.rq.Rq;
 import com.ll.rest.global.rsData.RsData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -26,8 +27,7 @@ import java.util.Optional;
 public class ApiV1PostController {
 
     private final PostService postService;
-    private final MemberService memberService;
-    private final HttpServletRequest request;
+    private final Rq rq;
 
     @GetMapping
     public List<PostDto> getItems() {
@@ -50,7 +50,7 @@ public class ApiV1PostController {
     public ResponseEntity<RsData<Void>> deleteItem(
             @PathVariable long id
     ) {
-        Member actor = checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -85,7 +85,7 @@ public class ApiV1PostController {
             @PathVariable long id,
             @RequestBody @Valid PostModifyReqBody reqBody
     ) {
-        Member actor = checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(id).get();
 
@@ -115,7 +115,7 @@ public class ApiV1PostController {
     public RsData<PostDto> writeItem(
             @RequestBody @Valid PostWriteReqBody reqBody
     ) {
-        Member actor = checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
 
@@ -124,17 +124,5 @@ public class ApiV1PostController {
                 "%d번 글이 작성되었습니다.".formatted(post.getId()),
                 new PostDto(post)
         );
-    }
-
-    private Member checkAuthentication() {
-        String credentials = request.getHeader("Authorization");
-        String apiKey = credentials.substring("Bearer ".length());
-
-        Optional<Member> opActor = memberService.findByApiKey(apiKey);
-
-        if (opActor.isEmpty())
-            throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
-
-        return opActor.get();
     }
 }
