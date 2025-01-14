@@ -8,21 +8,16 @@ import com.ll.rest.domain.post.post.service.PostService;
 import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rsData.RsData;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -133,9 +128,9 @@ public class ApiV1PostController {
 
     private Member checkAuthentication() {
         String credentials = request.getHeader("Authorization");
-        String password2 = credentials.substring("Bearer ".length());
+        String apiKey = credentials.substring("Bearer ".length());
 
-        Optional<Member> opActor = memberService.findByPassword2(password2);
+        Optional<Member> opActor = memberService.findByApiKey(apiKey);
 
         if (opActor.isEmpty())
             throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
