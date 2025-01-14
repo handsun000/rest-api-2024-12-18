@@ -20,7 +20,7 @@ public class PostComment extends BaseTime {
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    private Member author;
 
     @Column(columnDefinition = "TEXT")
     private String content;

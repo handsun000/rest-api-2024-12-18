@@ -32,7 +32,7 @@ public class Post extends BaseTime {
     public void addComment(Member author, String content) {
         PostComment comment = PostComment.builder()
                 .post(this)
-                .member(author)
+                .author(author)
                 .content(content)
                 .build();
 
