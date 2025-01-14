@@ -8,6 +8,7 @@ import com.ll.rest.domain.post.post.service.PostService;
 import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rq.Rq;
 import com.ll.rest.global.rsData.RsData;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -23,10 +24,11 @@ import java.util.List;
 @RequestMapping("/api/v1/posts/{postId}/comments")
 @RequiredArgsConstructor
 public class ApiV1PostCommentController {
-    @Autowired
-    @Lazy
-    private ApiV1PostCommentController self;
+//    @Autowired
+//    @Lazy
+//    private ApiV1PostCommentController self;
 
+    private final EntityManager em;
     private final PostService postService;
     private final Rq rq;
 
@@ -71,11 +73,20 @@ public class ApiV1PostCommentController {
     }
 
     @PostMapping
+    @Transactional
     public RsData<PostCommentDto> writeItem(
             @PathVariable long postId,
             @RequestBody @Valid PostCommentWriteReqBody reqBody
     ) {
-        PostComment comment = self._writeItem(postId, reqBody);
+//        PostComment comment = self._writeItem(postId, reqBody);
+        Member author = rq.checkAuthentication();
+
+        Post post = postService.findById(postId)
+                .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
+
+        PostComment comment = post.addComment(author, reqBody.content);
+
+        em.flush();
 
         return new RsData<>(
                 "201-1",
@@ -84,14 +95,14 @@ public class ApiV1PostCommentController {
         );
     }
 
-    @Transactional
-    public PostComment _writeItem(long postId, PostCommentWriteReqBody reqBody) {
-        Member author = rq.checkAuthentication();
-
-        Post post = postService.findById(postId)
-                .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
-
-
-        return post.addComment(author, reqBody.content);
-    }
+//    @Transactional
+//    public PostComment _writeItem(long postId, PostCommentWriteReqBody reqBody) {
+//        Member author = rq.checkAuthentication();
+//
+//        Post post = postService.findById(postId)
+//                .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
+//
+//
+//        return post.addComment(author, reqBody.content);
+//    }
 }
