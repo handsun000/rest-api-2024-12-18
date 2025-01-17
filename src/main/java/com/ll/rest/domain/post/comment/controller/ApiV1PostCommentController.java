@@ -28,7 +28,6 @@ public class ApiV1PostCommentController {
 //    @Lazy
 //    private ApiV1PostCommentController self;
 
-    private final EntityManager em;
     private final PostService postService;
     private final Rq rq;
 
@@ -40,8 +39,7 @@ public class ApiV1PostCommentController {
                 .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
 
         return post
-                .getComments()
-                .reversed()
+                .getCommentsByOrderByIdDesc()
                 .stream()
                 .map(PostCommentDto::new)
                 .toList();
@@ -56,10 +54,7 @@ public class ApiV1PostCommentController {
                 .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
 
         return post
-                .getComments()
-                .stream()
-                .filter(comment -> comment.getId() == id)
-                .findFirst()
+                .getCommentById(id)
                 .map(PostCommentDto::new)
                 .orElseThrow(() -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다.".formatted(id)));
 
@@ -86,7 +81,7 @@ public class ApiV1PostCommentController {
 
         PostComment comment = post.addComment(author, reqBody.content);
 
-        em.flush();
+        postService.flush();
 
         return new RsData<>(
                 "201-1",

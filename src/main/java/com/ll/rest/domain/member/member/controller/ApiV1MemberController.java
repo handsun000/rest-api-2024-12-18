@@ -87,8 +87,8 @@ public class ApiV1MemberController {
 
     @GetMapping("/me")
     public MemberDto me() {
-        Member member = rq.checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
-        return new MemberDto(member);
+        return new MemberDto(actor);
     }
 }
