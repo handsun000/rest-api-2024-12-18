@@ -51,4 +51,8 @@ public class Post extends BaseTime {
                 .filter(postComment -> postComment.getId() == id)
                 .findFirst();
     }
+
+    public void removeComment(PostComment comment) {
+        comments.remove(comment);
+    }
 }

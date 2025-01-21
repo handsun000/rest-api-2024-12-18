@@ -73,7 +73,6 @@ public class ApiV1PostCommentController {
             @PathVariable long postId,
             @RequestBody @Valid PostCommentWriteReqBody reqBody
     ) {
-//        PostComment comment = self._writeItem(postId, reqBody);
         Member author = rq.checkAuthentication();
 
         Post post = postService.findById(postId)
@@ -90,14 +89,60 @@ public class ApiV1PostCommentController {
         );
     }
 
-//    @Transactional
-//    public PostComment _writeItem(long postId, PostCommentWriteReqBody reqBody) {
-//        Member author = rq.checkAuthentication();
-//
-//        Post post = postService.findById(postId)
-//                .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
-//
-//
-//        return post.addComment(author, reqBody.content);
-//    }
+    record PostCommentModifyReqBody(
+            @NotBlank
+            @Length(min = 4)
+            String content
+    ) {
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public RsData<PostCommentDto> modifyItem(
+            @PathVariable long postId,
+            @PathVariable long id,
+            @RequestBody @Valid PostCommentModifyReqBody reqBody
+    ) {
+        Member author = rq.checkAuthentication();
+
+        Post post = postService.findById(postId)
+                .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
+
+        PostComment comment = post.getCommentById(id)
+                .orElseThrow(() -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다.".formatted(id)));
+
+        if (!comment.getAuthor().equals(author)) {
+            throw new ServiceException("403-1", "작성자만 수정할 수 있습니다.");
+        }
+
+        comment.modify(reqBody.content);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 댓글이 수정되었습니다.".formatted(postId),
+                new PostCommentDto(comment)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public RsData<Void> deleteItem(
+            @PathVariable long id,
+            @PathVariable long postId
+    ) {
+        Member member = rq.checkAuthentication();
+
+        Post post = postService.findById(postId)
+                .orElseThrow(() -> new ServiceException("401-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
+
+        PostComment comment = post.getCommentById(id)
+                .orElseThrow(() -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다.".formatted(id)));
+
+        post.removeComment(comment);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 댓글이 삭제되었습니다.".formatted(id)
+        );
+    }
 }

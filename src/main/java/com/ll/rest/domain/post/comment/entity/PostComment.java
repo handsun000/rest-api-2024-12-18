@@ -10,7 +10,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,4 +23,8 @@ public class PostComment extends BaseTime {
 
     @Column(columnDefinition = "TEXT")
     private String content;
+
+    public void modify(String content) {
+        this.content = content;
+    }
 }
