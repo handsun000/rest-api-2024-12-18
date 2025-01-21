@@ -2,6 +2,7 @@ package com.ll.rest.domain.post.post.entity;
 
 import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.post.comment.entity.PostComment;
+import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.jpa.entity.BaseTime;
 import jakarta.persistence.*;
 import lombok.*;
@@ -54,5 +55,21 @@ public class Post extends BaseTime {
 
     public void removeComment(PostComment comment) {
         comments.remove(comment);
+    }
+
+    public void checkActorCanDelete(Member actor) {
+        if (actor == null) throw new ServiceException("403-1", "로그인 후 이용해주세요");
+
+        if (actor.isAdmin() || actor.equals(author)) return;
+
+        throw new ServiceException("403-2", "작성자만 글을 삭제할 권한이 있습니다.");
+    }
+
+    public void checkActorCanModify(Member actor) {
+        if (actor == null) throw new ServiceException("403-1", "로그인 후 이용해주세요");
+
+        if (actor.isAdmin() || actor.equals(author)) return;
+
+        throw new ServiceException("403-2", "작성자만 글을 수정할 권한이 있습니다.");
     }
 }

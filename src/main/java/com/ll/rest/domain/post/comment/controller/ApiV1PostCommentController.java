@@ -103,7 +103,7 @@ public class ApiV1PostCommentController {
             @PathVariable long id,
             @RequestBody @Valid PostCommentModifyReqBody reqBody
     ) {
-        Member author = rq.checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(postId)
                 .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
@@ -111,9 +111,7 @@ public class ApiV1PostCommentController {
         PostComment comment = post.getCommentById(id)
                 .orElseThrow(() -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다.".formatted(id)));
 
-        if (!comment.getAuthor().equals(author)) {
-            throw new ServiceException("403-1", "작성자만 수정할 수 있습니다.");
-        }
+        comment.checkActorCanModify(actor);
 
         comment.modify(reqBody.content);
 
@@ -130,13 +128,15 @@ public class ApiV1PostCommentController {
             @PathVariable long id,
             @PathVariable long postId
     ) {
-        Member member = rq.checkAuthentication();
+        Member actor = rq.checkAuthentication();
 
         Post post = postService.findById(postId)
                 .orElseThrow(() -> new ServiceException("401-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
 
         PostComment comment = post.getCommentById(id)
                 .orElseThrow(() -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다.".formatted(id)));
+
+        comment.checkActorCanDelete(actor);
 
         post.removeComment(comment);
 
