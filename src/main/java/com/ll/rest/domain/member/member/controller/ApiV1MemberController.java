@@ -49,7 +49,7 @@ public class ApiV1MemberController {
     @PostMapping("/login")
     public RsData<MemberLoginResBody> login(@RequestBody MemberLoginReqBody reqBody) {
         Member member = memberService.findByUsername(reqBody.username)
-                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않습니다."));
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 사용자 입니다."));
 
         if (!member.matchPassword(reqBody.password))
             throw new ServiceException("401-2", "비밀번호가 맞지 않습니다.");
