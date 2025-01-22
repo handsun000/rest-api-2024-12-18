@@ -3,8 +3,8 @@ package com.ll.rest.domain.member.member.controller;
 import com.ll.rest.domain.member.member.dto.MemberDto;
 import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.member.member.service.MemberService;
+import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rsData.RsData;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,8 @@ public class ApiV1MemberController {
             String username,
             String password,
             String nickname
-    ){}
+    ) {
+    }
 
     @PostMapping("/join")
     public RsData<MemberDto> join(@RequestBody MemberJoinReqBody reqBody) {
@@ -30,4 +31,35 @@ public class ApiV1MemberController {
                 new MemberDto(member)
         );
     }
+
+    record MemberLoginReqBody(
+            String username,
+            String password
+    ) {
+    }
+
+    record MemberLoginResBody(
+            MemberDto item,
+            String apiKey
+    ) {
+    }
+
+    @PostMapping("/login")
+    public RsData<MemberLoginResBody> login(@RequestBody MemberLoginReqBody reqBody) {
+        Member member = memberService.findByUsername(reqBody.username)
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않습니다."));
+
+        if (!member.matchPassword(reqBody.password))
+            throw new ServiceException("401-2", "비밀번호가 맞지 않습니다.");
+
+        return new RsData<>(
+                "200-1",
+                "%s님 환영합니다.".formatted(member.getNickname()),
+                new MemberLoginResBody(
+                        new MemberDto(member),
+                        member.getApiKey()
+                )
+        );
+    }
+
 }
