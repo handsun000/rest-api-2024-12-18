@@ -4,6 +4,7 @@ import com.ll.rest.domain.member.member.dto.MemberDto;
 import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.member.member.service.MemberService;
 import com.ll.rest.global.exception.ServiceException;
+import com.ll.rest.global.rq.Rq;
 import com.ll.rest.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class ApiV1MemberController {
 
     private final MemberService memberService;
+    private final Rq rq;
 
     record MemberJoinReqBody(
             String username,
@@ -62,4 +64,11 @@ public class ApiV1MemberController {
         );
     }
 
+    @GetMapping("/me")
+    public MemberDto me() {
+
+        Member member = rq.checkAuthentication();
+
+        return new MemberDto(member);
+    }
 }
