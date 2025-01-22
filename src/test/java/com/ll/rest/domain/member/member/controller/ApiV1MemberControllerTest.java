@@ -70,8 +70,39 @@ public class ApiV1MemberControllerTest {
     }
 
     @Test
+    @DisplayName("회원가입 without username, password, nickname")
+    void t2() throws Exception {
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/api/v1/members/join")
+                                .content(
+                                        """
+                                                {
+                                                    "username" : "",
+                                                    "password" : "",
+                                                    "nickname" : ""
+                                                }
+                                                """.stripIndent()
+                                )
+                                .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1MemberController.class))
+                .andExpect(handler().methodName("join"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.resultCode").value("400-1"))
+                .andExpect(jsonPath("$.msg").value("""
+                        nickname-NotBlank-must not be blank
+                        password-NotBlank-must not be blank
+                        username-NotBlank-must not be blank
+                        """.stripIndent().trim()));
+    }
+
+    @Test
     @DisplayName("회원가입 시 이미 사용중인 username, 409")
-    void v2() throws Exception {
+    void v3() throws Exception {
         mvc
                 .perform(
                         post("/api/v1/members/join")
@@ -94,7 +125,7 @@ public class ApiV1MemberControllerTest {
 
     @Test
     @DisplayName("로그인")
-    void t3() throws Exception {
+    void t4() throws Exception {
 
         Member member = memberService.findByUsername("user1").get();
 
@@ -126,7 +157,7 @@ public class ApiV1MemberControllerTest {
 
     @Test
     @DisplayName("로그인, without username")
-    void t4() throws Exception {
+    void t5() throws Exception {
 
         mvc
                 .perform(
@@ -149,7 +180,7 @@ public class ApiV1MemberControllerTest {
 
     @Test
     @DisplayName("로그인, without password")
-    void t5() throws Exception {
+    void t6() throws Exception {
 
         mvc
                 .perform(
@@ -172,7 +203,7 @@ public class ApiV1MemberControllerTest {
 
     @Test
     @DisplayName("로그인, wrong username")
-    void t6() throws Exception {
+    void t7() throws Exception {
 
         mvc
                 .perform(
@@ -195,7 +226,7 @@ public class ApiV1MemberControllerTest {
 
     @Test
     @DisplayName("로그인, wrong password")
-    void t7() throws Exception {
+    void t8() throws Exception {
 
         mvc
                 .perform(
@@ -218,7 +249,7 @@ public class ApiV1MemberControllerTest {
 
     @Test
     @DisplayName("내 정보, with user1")
-    void t8() throws Exception {
+    void t9() throws Exception {
 
         Member member = memberService.findByUsername("user1").get();
 
