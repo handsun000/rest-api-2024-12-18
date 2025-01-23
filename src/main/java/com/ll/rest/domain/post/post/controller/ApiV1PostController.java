@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jdk.jfr.Frequency;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,8 @@ public class ApiV1PostController {
             @NotBlank
             @Length(min = 2, max = 10000000)
             String content
-    ){}
+    ) {
+    }
 
     @PostMapping
     public RsData<PostDto> write(
@@ -56,6 +58,37 @@ public class ApiV1PostController {
         return new RsData<>(
                 "201-1",
                 "%s번 글이 작성 되었습니다.".formatted(post.getId()),
+                new PostDto(post)
+        );
+    }
+
+    record PostModifyReqBody(
+            @NotBlank
+            @Length(min = 2, max = 100)
+            String title,
+            @NotBlank
+            @Length(min = 2, max = 10000000)
+            String content
+    ){}
+
+    @PutMapping("/{id}")
+    @Transactional
+    public RsData<PostDto> modify(
+            @PathVariable long id,
+            @RequestBody @Valid PostModifyReqBody reqBody
+    ) {
+        Member member = rq.checkAuthentication();
+        Post post = postService.findById(id).get();
+
+        post.checkActorCanModify(member);
+
+        post.modify(reqBody.title, reqBody.content);
+
+        postService.flush();
+
+        return new RsData<>(
+                "200-1",
+                "%s번 글이 수정되었습니다.".formatted(post.getId()),
                 new PostDto(post)
         );
     }

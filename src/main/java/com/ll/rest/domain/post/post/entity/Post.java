@@ -72,4 +72,9 @@ public class Post extends BaseTime {
 
         throw new ServiceException("403-2", "작성자만 글을 수정할 권한이 있습니다.");
     }
+
+    public void modify(String title, String content) {
+        setTitle(title);
+        setContent(content);
+    }
 }
