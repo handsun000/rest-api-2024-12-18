@@ -263,4 +263,32 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
                 .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
     }
+
+    @Test
+    @DisplayName("글 수정, with no permission ")
+    void t9() throws Exception {
+
+        Member member = memberService.findByUsername("user2").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/posts/1")
+                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .content("""
+                                        {
+                                            "title" : "제목 new",
+                                            "content" : "내용 new"
+                                        }
+                                        """)
+                                .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-2"))
+                .andExpect(jsonPath("$.msg").value("작성자만 글을 수정할 권한이 있습니다."));
+    }
 }
