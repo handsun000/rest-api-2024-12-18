@@ -175,7 +175,7 @@ public class ApiV1PostControllerTest {
         Member member = memberService.findByUsername("user1").get();
         Post post = postService.findById(1).get();
 
-        LocalDateTime oldDateTime = post.getModifyDate();
+        LocalDateTime oldModifyDate = post.getModifyDate();
 
         ResultActions resultActions = mvc
                 .perform(
@@ -199,7 +199,7 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.msg").value("%s번 글이 수정되었습니다.".formatted(post.getId())))
                 .andExpect(jsonPath("$.data.id").value(post.getId()))
                 .andExpect(jsonPath("$.data.createDate").value(Matchers.startsWith(post.getCreateDate().toString().substring(0, 10))))
-                .andExpect(jsonPath("$.data.modifyDate").value(Matchers.not(Matchers.startsWith(oldDateTime.toString().substring(0, 10)))))
+                .andExpect(jsonPath("$.data.modifyDate").value(Matchers.not(Matchers.startsWith(oldModifyDate.toString().substring(0, 25)))))
                 .andExpect(jsonPath("$.data.authorId").value(post.getAuthor().getId()))
                 .andExpect(jsonPath("$.data.authorName").value(post.getAuthor().getName()))
                 .andExpect(jsonPath("$.data.title").value("제목 new"))
