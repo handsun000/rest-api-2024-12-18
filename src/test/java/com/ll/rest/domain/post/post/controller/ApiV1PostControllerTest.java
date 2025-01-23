@@ -344,4 +344,22 @@ public class ApiV1PostControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
                 .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
     }
+
+    @Test
+    @DisplayName("글 삭제, with no permission")
+    void t13() throws Exception {
+        Member member = memberService.findByUsername("user2").get();
+
+        mvc
+                .perform(
+                        delete("/api/v1/posts/1")
+                                .header("Authorization", "Bearer " + member.getApiKey())
+                )
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.resultCode").value("403-2"))
+                .andExpect(jsonPath("$.msg").value("작성자만 글을 삭제할 권한이 있습니다."));
+    }
 }
