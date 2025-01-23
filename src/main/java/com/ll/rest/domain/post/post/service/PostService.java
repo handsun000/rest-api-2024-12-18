@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -49,4 +50,9 @@ public class PostService {
     public void flush() {
         postRepository.flush();
     }
+
+    public Optional<Post> findLatest() {
+        return postRepository.findFirstByOrderByIdDesc();
+    }
+
 }

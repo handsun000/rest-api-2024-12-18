@@ -29,99 +29,33 @@ public class ApiV1PostController {
     private final PostService postService;
     private final Rq rq;
 
-    @GetMapping
-    public List<PostDto> getItems() {
-        return postService.findAllByOrderByIdDesc()
-                .stream()
-                .map(PostDto::new)
-                .toList();
-    }
-
-    @GetMapping("/{id}")
-    public PostDto getItem(
+    @GetMapping("{id}")
+    public PostDto item(
             @PathVariable long id
     ) {
-        return postService.findById(id)
-                .map(PostDto::new)
-                .orElseThrow();
-    }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<RsData<Void>> deleteItem(
-            @PathVariable long id
-    ) {
-        Member actor = rq.checkAuthentication();
-
-        Post post = postService.findById(id).get();
-
-        post.checkActorCanDelete(actor);
-
-        postService.delete(post);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(
-                        new RsData<>(
-                                "200-1",
-                                "%d번 글이 삭제되었습니다.".formatted(id)
-                        )
-                );
-    }
-
-    record PostModifyReqBody(
-            @NotBlank
-            @Length(min = 2)
-            String title,
-            @NotBlank
-            @Length(min = 2)
-            String content
-    ) {
-
-    }
-
-    @PutMapping("/{id}")
-    @Transactional
-    public RsData<PostDto> modifyItem(
-            @PathVariable long id,
-            @RequestBody @Valid PostModifyReqBody reqBody
-    ) {
-        Member actor = rq.checkAuthentication();
-
-        Post post = postService.findById(id).get();
-
-        post.checkActorCanModify(actor);
-
-        postService.modify(post, reqBody.title, reqBody.content);
-
-        return new RsData<>(
-                "200-1",
-                "%d번 글이 수정되었습니다.".formatted(id),
-                new PostDto(post)
-        );
+        return new PostDto(postService.findById(id).get());
     }
 
     record PostWriteReqBody(
             @NotBlank
-            @Length(min = 2)
+            @Length(min = 2, max = 100)
             String title,
             @NotBlank
-            @Length(min = 2)
+            @Length(min = 2, max = 10000000)
             String content
-    ) {
+    ){}
 
-    }
-
-    @PostMapping()
-    public RsData<PostDto> writeItem(
+    @PostMapping
+    public RsData<PostDto> write(
             @RequestBody @Valid PostWriteReqBody reqBody
     ) {
-        Member actor = rq.checkAuthentication();
-
-        Post post = postService.write(actor, reqBody.title, reqBody.content);
+        Member member = rq.checkAuthentication();
+        Post post = postService.write(member, reqBody.title, reqBody.content);
 
         return new RsData<>(
                 "201-1",
-                "%d번 글이 작성되었습니다.".formatted(post.getId()),
+                "%s번 글이 작성 되었습니다.".formatted(post.getId()),
                 new PostDto(post)
         );
     }

@@ -10,9 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PostDto {
     private long id;
-    @JsonProperty("createdDatetime")
     private LocalDateTime createDate;
-    @JsonProperty("modifiedDatetime")
     private LocalDateTime modifyDate;
     private long authorId;
     private String authorName;
