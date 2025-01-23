@@ -238,4 +238,29 @@ public class ApiV1PostControllerTest {
                         title-NotBlank-must not be blank
                         """.stripIndent().trim()));
     }
+
+    @Test
+    @DisplayName("글 수정, with no actor ")
+    void t8() throws Exception {
+
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/posts/1")
+                                .content("""
+                                        {
+                                            "title" : "제목 new",
+                                            "content" : "내용 new"
+                                        }
+                                        """)
+                                .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
+    }
 }
