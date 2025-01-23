@@ -311,4 +311,37 @@ public class ApiV1PostControllerTest {
 
         assertThat(postService.findById(1)).isEmpty();
     }
+
+    @Test
+    @DisplayName("글 삭제, with not existing post id")
+    void t11() throws Exception {
+        Member member = memberService.findByUsername("user1").get();
+
+        mvc
+                .perform(
+                        delete("/api/v1/posts/1000000")
+                                .header("Authorization", "Bearer " + member.getApiKey())
+                )
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.resultCode").value("404-1"))
+                .andExpect(jsonPath("$.msg").value("해당 데이터가 존재하지 않습니다."));
+    }
+
+    @Test
+    @DisplayName("글 삭제, with no actor")
+    void t12() throws Exception {
+        mvc
+                .perform(
+                        delete("/api/v1/posts/1000000")
+                )
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.resultCode").value("401-1"))
+                .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
+    }
 }
