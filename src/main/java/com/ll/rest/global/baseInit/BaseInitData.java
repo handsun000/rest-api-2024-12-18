@@ -46,6 +46,8 @@ public class BaseInitData {
         if (AppConfig.isNotProd()) memberUser2.setApiKey("user2");
         Member memberUser3 = memberService.join("user3", "1234user3", "유저3");
         if (AppConfig.isNotProd()) memberUser3.setApiKey("user3");
+        Member memberUser4 = memberService.join("user4", "1234user4", "유저4");
+        if (AppConfig.isNotProd()) memberUser4.setApiKey("user4");
     }
 
     @Transactional
@@ -55,6 +57,7 @@ public class BaseInitData {
         Member user1 = memberService.findByUsername("user1").get();
         Member user2 = memberService.findByUsername("user2").get();
         Member user3 = memberService.findByUsername("user3").get();
+        Member user4 = memberService.findByUsername("user4").get();
 
         Post post1 = postService.write(user1,"축구 하실 분?", "14시 까지 22명을 모아야 합니다.", true);
         post1.addComment(user2, "저요!");
@@ -70,5 +73,9 @@ public class BaseInitData {
         post3.addComment(user2, "저요!");
         post3.addComment(user1, "저도할래요");
         post3.addComment(user3, "저요!");
+
+        Post post4 = postService.write(user3, "당구 하실 분?", "17시 까지 11명을 모아야 합니다.", true);
+        Post post5 = postService.write(user4, "볼링 하실 분?", "18시 까지 14명을 모아야 합니다.", false);
+        Post post6 = postService.write(user4, "수영 하실 분?", "19시 까지 16명을 모아야 합니다.", false);
     }
 }

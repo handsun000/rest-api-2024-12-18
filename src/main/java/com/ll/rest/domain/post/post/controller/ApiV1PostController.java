@@ -34,8 +34,15 @@ public class ApiV1PostController {
     public PostDto item(
             @PathVariable long id
     ) {
+        Post post = postService.findById(id).get();
 
-        return new PostDto(postService.findById(id).get());
+        if (!post.isPublished()) {
+            Member member = rq.checkAuthentication();
+
+            post.checkActorCanRead(member);
+        }
+
+        return new PostDto(post);
     }
 
     record PostWriteReqBody(
