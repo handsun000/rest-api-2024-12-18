@@ -52,7 +52,8 @@ public class ApiV1PostController {
             @NotBlank
             @Length(min = 2, max = 10000000)
             String content,
-            boolean published
+            boolean published,
+            boolean listed
     ) {
     }
 
@@ -61,7 +62,7 @@ public class ApiV1PostController {
             @RequestBody @Valid PostWriteReqBody reqBody
     ) {
         Member member = rq.checkAuthentication();
-        Post post = postService.write(member, reqBody.title, reqBody.content, reqBody.published);
+        Post post = postService.write(member, reqBody.title, reqBody.content, reqBody.published, reqBody.listed);
 
         return new RsData<>(
                 "201-1",
