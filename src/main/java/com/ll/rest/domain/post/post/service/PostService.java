@@ -3,6 +3,7 @@ package com.ll.rest.domain.post.post.service;
 import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.repository.PostRepository;
+import com.ll.rest.standard.util.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -65,5 +66,24 @@ public class PostService {
         PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
 
         return postRepository.findByListed(listed, pageRequest);
+    }
+
+    public Page<Post> findByListedPaged(
+            boolean listed,
+            String searchKeywordType,
+            String searchKeyword,
+            int page,
+            int pageSize
+    ) {
+        if (Ut.str.isBlank(searchKeyword)) return findByListedPaged(listed, page, pageSize);
+
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
+
+        searchKeyword = "%" + searchKeyword + "%";
+
+        return switch (searchKeywordType) {
+            case "content" -> postRepository.findByListedAndContentLike(listed, searchKeyword, pageRequest);
+            default -> postRepository.findByListedAndTitleLike(listed, searchKeyword, pageRequest);
+        };
     }
 }
