@@ -4,9 +4,13 @@ import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.post.post.entity.Post;
 import com.ll.rest.domain.post.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,4 +61,9 @@ public class PostService {
         return postRepository.findFirstByOrderByIdDesc();
     }
 
+    public List<Post> findByListedPaged(boolean listed, int page, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(page - 1, pageSize, Sort.by(Sort.Order.desc("id")));
+        Page<Post> postPage = postRepository.findByListed(listed, pageRequest);
+        return postPage.getContent();
+    }
 }
