@@ -44,7 +44,8 @@ public class ApiV1PostController {
             String title,
             @NotBlank
             @Length(min = 2, max = 10000000)
-            String content
+            String content,
+            boolean published
     ) {
     }
 
@@ -53,7 +54,7 @@ public class ApiV1PostController {
             @RequestBody @Valid PostWriteReqBody reqBody
     ) {
         Member member = rq.checkAuthentication();
-        Post post = postService.write(member, reqBody.title, reqBody.content);
+        Post post = postService.write(member, reqBody.title, reqBody.content, reqBody.published);
 
         return new RsData<>(
                 "201-1",

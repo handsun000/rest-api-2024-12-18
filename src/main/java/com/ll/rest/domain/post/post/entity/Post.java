@@ -27,6 +27,8 @@ public class Post extends BaseTime {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    private boolean published;
+
     @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     @Builder.Default
     private List<PostComment> comments = new ArrayList<>();
