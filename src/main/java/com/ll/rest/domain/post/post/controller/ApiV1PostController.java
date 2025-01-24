@@ -77,7 +77,9 @@ public class ApiV1PostController {
             String title,
             @NotBlank
             @Length(min = 2, max = 10000000)
-            String content
+            String content,
+            boolean published,
+            boolean listed
     ){}
 
     @PutMapping("/{id}")
@@ -91,7 +93,7 @@ public class ApiV1PostController {
 
         post.checkActorCanModify(member);
 
-        post.modify(reqBody.title, reqBody.content);
+        post.modify(reqBody.title, reqBody.content, reqBody.published, reqBody.listed);
 
         postService.flush();
 

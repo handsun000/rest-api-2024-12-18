@@ -16,6 +16,9 @@ public class PostDto {
     private String authorName;
     private String title;
     private String content;
+    private boolean published;
+    private boolean listed;
+
 
     public PostDto(Post post) {
         this.id = post.getId();
@@ -25,5 +28,7 @@ public class PostDto {
         this.authorName = post.getAuthor().getName();
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.published = post.isPublished();
+        this.listed = post.isListed();
     }
 }

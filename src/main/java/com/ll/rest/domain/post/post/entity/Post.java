@@ -77,9 +77,11 @@ public class Post extends BaseTime {
         throw new ServiceException("403-1", "작성자만 글을 수정할 권한이 있습니다.");
     }
 
-    public void modify(String title, String content) {
+    public void modify(String title, String content, boolean published, boolean listed) {
         setTitle(title);
         setContent(content);
+        setPublished(published);
+        setListed(listed);
     }
 
     public void checkActorCanRead(Member actor) {
