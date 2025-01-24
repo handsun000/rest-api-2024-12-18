@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -441,29 +442,33 @@ public class ApiV1PostControllerTest {
     @Test
     @DisplayName("다건 조회")
     void t17() throws Exception {
+
+        Page<Post> postPage = postService.findByListedPaged(true, 1, 3);
+
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts")
                 )
-                .andDo(print());
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1PostController.class))
+                .andExpect(handler().methodName("items"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(postPage.getTotalElements()));
 
-        List<Post> posts = postService.findByListedPaged(true, 1, 3);
+        List<Post> posts = postPage.getContent();
 
         for (int i = 0; i<posts.size(); i++) {
             Post post = posts.get(i);
             resultActions
-                    .andExpect(handler().handlerType(ApiV1PostController.class))
-                    .andExpect(handler().methodName("items"))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$[%d].id".formatted(i)).value(post.getId()))
-                    .andExpect(jsonPath("$[%d].createDate".formatted(i)).value(Matchers.startsWith(post.getCreateDate().toString().substring(0, 10))))
-                    .andExpect(jsonPath("$[%d].createDate".formatted(i)).value(Matchers.startsWith(post.getModifyDate().toString().substring(0, 10))))
-                    .andExpect(jsonPath("$[%d].authorId".formatted(i)).value(post.getAuthor().getId()))
-                    .andExpect(jsonPath("$[%d].authorName".formatted(i)).value(post.getAuthor().getName()))
-                    .andExpect(jsonPath("$[%d].title".formatted(i)).value(post.getTitle()))
-                    .andExpect(jsonPath("$[%d].content".formatted(i)).doesNotExist())
-                    .andExpect(jsonPath("$[%d].published".formatted(i)).value(post.isPublished()))
-                    .andExpect(jsonPath("$[%d].listed".formatted(i)).value(post.isListed()));
+                    .andExpect(jsonPath("$.content[%d].id".formatted(i)).value(post.getId()))
+                    .andExpect(jsonPath("$.content[%d].createDate".formatted(i)).value(Matchers.startsWith(post.getCreateDate().toString().substring(0, 10))))
+                    .andExpect(jsonPath("$.content[%d].createDate".formatted(i)).value(Matchers.startsWith(post.getModifyDate().toString().substring(0, 10))))
+                    .andExpect(jsonPath("$.content[%d].authorId".formatted(i)).value(post.getAuthor().getId()))
+                    .andExpect(jsonPath("$.content[%d].authorName".formatted(i)).value(post.getAuthor().getName()))
+                    .andExpect(jsonPath("$.content[%d].title".formatted(i)).value(post.getTitle()))
+                    .andExpect(jsonPath("$.content[%d].content".formatted(i)).doesNotExist())
+                    .andExpect(jsonPath("$.content[%d].published".formatted(i)).value(post.isPublished()))
+                    .andExpect(jsonPath("$.content[%d].listed".formatted(i)).value(post.isListed()));
         }
     }
 }

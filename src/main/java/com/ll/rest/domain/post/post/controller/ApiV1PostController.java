@@ -9,6 +9,7 @@ import com.ll.rest.domain.post.post.service.PostService;
 import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rq.Rq;
 import com.ll.rest.global.rsData.RsData;
+import com.ll.rest.standard.page.dto.PageDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -33,17 +34,14 @@ public class ApiV1PostController {
     private final Rq rq;
 
     @GetMapping
-    public List<PostDto> items(
+    public PageDto<PostDto> items(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize
     ) {
-
-        List<Post> posts = postService.findByListedPaged(true, page, pageSize);
-
-        return posts
-                .stream()
-                .map(PostDto::new)
-                .toList();
+        return new PageDto<>(
+                postService.findByListedPaged(true, page, pageSize)
+                        .map(PostDto::new)
+        );
     }
 
     @GetMapping("{id}")
