@@ -62,4 +62,35 @@ public class ApiV1PostCommentController {
                 "%d번 댓글이 삭제되었습니다.".formatted(id)
         );
     }
+
+    record ResBodyModify(
+            String content
+    ){}
+
+    @PutMapping("/{id}")
+    @Transactional
+    public RsData<PostCommentDto> items(
+            @PathVariable long postId,
+            @PathVariable long id,
+            @RequestBody ResBodyModify resBody
+    ) {
+        Member member = rq.checkAuthentication();
+
+        Post post = postService.findById(postId)
+                .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
+
+        PostComment comment = post.getCommentById(id)
+                .orElseThrow(() -> new ServiceException("404-2", "%d번 댓글은 존재하지 않습니다.".formatted(id)));
+
+        comment.checkActorCanModify(member);
+
+        comment.modify(resBody.content);
+
+        return new RsData<>(
+                "200-1",
+                "%d번 댓글이 수정되었습니다.".formatted(id),
+                new PostCommentDto(comment)
+        );
+    }
+
 }

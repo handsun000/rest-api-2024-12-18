@@ -87,4 +87,29 @@ public class ApiV1PostCommentControllerTest {
                 .andExpect(jsonPath("$.resultCode").value("200-1"))
                 .andExpect(jsonPath("$.msg").value("1번 댓글이 삭제되었습니다."));
     }
+
+    @Test
+    @DisplayName("댓글 수정")
+    void t3() throws Exception {
+
+        Member member = memberService.findByUsername("user2").get();
+
+        ResultActions resultActions = mvc
+                .perform(
+                        put("/api/v1/posts/1/comments/1")
+                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .content("""
+                                            {
+                                                "content" : "내용 new"
+                                            }
+                                        """)
+                                .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
+                )
+                .andDo(print())
+                .andExpect(handler().handlerType(ApiV1PostCommentController.class))
+                .andExpect(handler().methodName("items"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.msg").value("1번 댓글이 수정되었습니다."));
+    }
 }
