@@ -20,8 +20,11 @@ import org.hibernate.validator.constraints.Length;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,9 +93,16 @@ public class ApiV1PostController {
 
     @PostMapping
     public RsData<PostWithContentDto> write(
-            @RequestBody @Valid PostWriteReqBody reqBody
-    ) {
-        Member member = rq.checkAuthentication();
+            @RequestBody @Valid PostWriteReqBody reqBody,
+            @AuthenticationPrincipal UserDetails user
+            ) {
+
+        Member member = null;
+
+        if (user != null) {
+            member  = rq.getActorByUsername(user.getUsername());
+        }
+
         Post post = postService.write(member, reqBody.title, reqBody.content, reqBody.published, reqBody.listed);
 
         return new RsData<>(

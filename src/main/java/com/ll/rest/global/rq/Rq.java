@@ -35,4 +35,10 @@ public class Rq {
 
         return opActor.get();
     }
+
+    public Member getActorByUsername(String username) {
+
+        return memberService.findByUsername(username)
+                .orElseThrow(() -> new ServiceException("404-1", "사용자를 찾을 수 없습니다."));
+    }
 }
