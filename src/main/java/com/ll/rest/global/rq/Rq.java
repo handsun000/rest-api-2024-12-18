@@ -6,9 +6,15 @@ import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.standard.util.Ut;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequestScope
@@ -40,5 +46,21 @@ public class Rq {
 
         return memberService.findByUsername(username)
                 .orElseThrow(() -> new ServiceException("404-1", "사용자를 찾을 수 없습니다."));
+    }
+
+    public void setLogin(String username) {
+        UserDetails user = new User(
+                username,
+                "",
+                List.of()
+        );
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user,
+                user.getPassword(),
+                user.getAuthorities()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
