@@ -298,8 +298,6 @@ public class ApiV1MemberControllerTest {
                                 .header("Authorization", "Bearer wrong-api-key")
                 )
                 .andDo(print())
-                .andExpect(handler().handlerType(ApiV1MemberController.class))
-                .andExpect(handler().methodName("me"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
                 .andExpect(jsonPath("$.msg").value("사용자 인증정보가 올바르지 않습니다."));

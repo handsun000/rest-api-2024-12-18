@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,29 +26,6 @@ public class Rq {
     private final HttpServletRequest request;
     private final MemberService memberService;
 
-    public Member checkAuthentication() {
-        String credentials = request.getHeader("Authorization");
-
-        String apiKey = credentials == null ? "" : credentials.substring("Bearer ".length());
-
-        if (Ut.str.isBlank(apiKey)) {
-            throw new ServiceException("401-1", "인증정보가 없습니다.");
-        }
-
-        Optional<Member> opActor = memberService.findByApiKey(apiKey);
-
-        if (opActor.isEmpty())
-            throw new ServiceException("401-1", "사용자 인증정보가 올바르지 않습니다.");
-
-        return opActor.get();
-    }
-
-    public Member getActorByUsername(String username) {
-
-        return memberService.findByUsername(username)
-                .orElseThrow(() -> new ServiceException("404-1", "사용자를 찾을 수 없습니다."));
-    }
-
     public void setLogin(String username) {
         UserDetails user = new User(
                 username,
@@ -62,5 +40,17 @@ public class Rq {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    public Member getActor() {
+        SecurityContext context = SecurityContextHolder.getContext();
+
+        Authentication authentication = context.getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null || authentication.getPrincipal() instanceof String) return null;
+
+        UserDetails user = (UserDetails) authentication.getPrincipal();
+        String username = user.getUsername();
+        return memberService.findByUsername(username).get();
     }
 }

@@ -43,7 +43,7 @@ public class ApiV1PostController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int pageSize
     ) {
-        Member member = rq.checkAuthentication();
+        Member member = rq.getActor();
 
         return new PageDto<>(
                 postService.findByAuthorPaged(member, searchKeywordType, searchKeyword, page, pageSize)
@@ -71,7 +71,11 @@ public class ApiV1PostController {
         Post post = postService.findById(id).get();
 
         if (!post.isPublished()) {
-            Member member = rq.checkAuthentication();
+            Member member = rq.getActor();
+
+            if (member == null) {
+                throw new ServiceException("401-1", "로그인이 필요합니다.");
+            }
 
             post.checkActorCanRead(member);
         }
@@ -93,15 +97,10 @@ public class ApiV1PostController {
 
     @PostMapping
     public RsData<PostWithContentDto> write(
-            @RequestBody @Valid PostWriteReqBody reqBody,
-            @AuthenticationPrincipal UserDetails user
+            @RequestBody @Valid PostWriteReqBody reqBody
             ) {
 
-        Member member = null;
-
-        if (user != null) {
-            member  = rq.getActorByUsername(user.getUsername());
-        }
+        Member member = rq.getActor();
 
         Post post = postService.write(member, reqBody.title, reqBody.content, reqBody.published, reqBody.listed);
 
@@ -130,7 +129,7 @@ public class ApiV1PostController {
             @PathVariable long id,
             @RequestBody @Valid PostModifyReqBody reqBody
     ) {
-        Member member = rq.checkAuthentication();
+        Member member = rq.getActor();
         Post post = postService.findById(id).get();
 
         post.checkActorCanModify(member);
@@ -150,7 +149,7 @@ public class ApiV1PostController {
     public RsData<Void> delete(
             @PathVariable long id
     ) {
-        Member member = rq.checkAuthentication();
+        Member member = rq.getActor();
         Post post = postService.findById(id).get();
 
         post.checkActorCanDelete(member);

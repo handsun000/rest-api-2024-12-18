@@ -45,7 +45,7 @@ public class ApiV1PostCommentController {
             @PathVariable long postId,
             @PathVariable long id
     ) {
-        Member member = rq.checkAuthentication();
+        Member member = rq.getActor();
 
         Post post = postService.findById(postId)
                 .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));
@@ -74,7 +74,7 @@ public class ApiV1PostCommentController {
             @PathVariable long id,
             @RequestBody ResBodyModify resBody
     ) {
-        Member member = rq.checkAuthentication();
+        Member member = rq.getActor();
 
         Post post = postService.findById(postId)
                 .orElseThrow(() -> new ServiceException("404-1", "%d번 글은 존재하지 않습니다.".formatted(postId)));

@@ -171,11 +171,9 @@ public class ApiV1PostControllerTest {
                                 .contentType(new MediaType(MediaType.APPLICATION_JSON, StandardCharsets.UTF_8))
                 )
                 .andDo(print())
-                .andExpect(handler().handlerType(ApiV1PostController.class))
-                .andExpect(handler().methodName("write"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
-                .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
+                .andExpect(jsonPath("$.msg").value("사용자 인증정보가 올바르지 않습니다."));
     }
 
     @Test
@@ -271,11 +269,9 @@ public class ApiV1PostControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1PostController.class))
-                .andExpect(handler().methodName("modify"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
-                .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
+                .andExpect(jsonPath("$.msg").value("사용자 인증정보가 올바르지 않습니다."));
     }
 
     @Test
@@ -352,11 +348,9 @@ public class ApiV1PostControllerTest {
                         delete("/api/v1/posts/1000000")
                 )
                 .andDo(print())
-                .andExpect(handler().handlerType(ApiV1PostController.class))
-                .andExpect(handler().methodName("delete"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
-                .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
+                .andExpect(jsonPath("$.msg").value("사용자 인증정보가 올바르지 않습니다."));
     }
 
     @Test
@@ -414,11 +408,9 @@ public class ApiV1PostControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().handlerType(ApiV1PostController.class))
-                .andExpect(handler().methodName("item"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.resultCode").value("401-1"))
-                .andExpect(jsonPath("$.msg").value("인증정보가 없습니다."));
+                .andExpect(jsonPath("$.msg").value("로그인이 필요합니다."));
     }
 
     @Test
