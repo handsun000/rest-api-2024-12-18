@@ -3,9 +3,7 @@ package com.ll.rest.domain.member.member.service;
 import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.member.member.service.AuthTokenService;
 import com.ll.rest.standard.util.Ut;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
@@ -42,24 +41,35 @@ public class AuthTokenServiceTest {
     @Test
     @DisplayName("jjwt 로 JWT 생성, {name=\"Paul\", age=23}")
     void t2() {
-        Claims claims = Jwts.claims()
-                .add("name", "Paul")
-                .add("age", 23)
-                .build();
+
+        Map<String, Object> payload = Map.of(
+                "id", "paul",
+                "age", 23
+        );
 
         Date issuedAt = new Date();
         Date expiration = new Date(issuedAt.getTime() + 1000L * expireSeconds);
 
-        Key secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes());
 
-        String jwt = Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(issuedAt)
-                .setExpiration(expiration)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+        String jwtStr = Jwts.builder()
+                .claims(payload)
+                .issuedAt(issuedAt)
+                .expiration(expiration)
+                .signWith(secretKey)
                 .compact();
 
-        assertThat(jwt).isNotBlank();
+        assertThat(jwtStr).isNotBlank();
+
+        Map<String, Object> parsedPayload = (Map<String, Object>) Jwts
+                .parser()
+                .verifyWith(secretKey)
+                .build()
+                .parse(jwtStr)
+                .getPayload();
+
+        assertThat(parsedPayload).containsAllEntriesOf(payload);
+
     }
 
     @Test
