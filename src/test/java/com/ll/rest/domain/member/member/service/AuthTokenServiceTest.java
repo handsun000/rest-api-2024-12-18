@@ -95,5 +95,14 @@ public class AuthTokenServiceTest {
         String accessToken = authTokenService.genAccessToken(member);
 
         assertThat(accessToken).isNotBlank();
+        assertThat(Ut.jwt.isValid(secret, accessToken)).isTrue();
+
+        Map<String, Object> parsedPayload = authTokenService.payload(secret, accessToken);
+        assertThat(parsedPayload).containsAllEntriesOf(
+                Map.of(
+                        "id", member.getId(),
+                        "username", member.getUsername()
+                )
+        );
     }
 }
