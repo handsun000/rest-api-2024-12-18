@@ -88,11 +88,12 @@ public class ApiV1PostControllerTest {
     void v3() throws Exception {
 
         Member actor = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(actor);
 
         ResultActions resultActions = mvc
                 .perform(
                         post("/api/v1/posts")
-                                .header("Authorization", "Bearer " + actor.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                                 .content("""
                                         {
                                             "title" : "제목 new",
@@ -129,11 +130,12 @@ public class ApiV1PostControllerTest {
     @DisplayName("글 작성, with no input")
     void t4() throws Exception {
         Member actor = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(actor);
 
         mvc
                 .perform(
                         post("/api/v1/posts")
-                                .header("Authorization", "Bearer " + actor.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                                 .content("""
                                         {
                                             "title" : "",
@@ -181,6 +183,8 @@ public class ApiV1PostControllerTest {
     void t6() throws Exception {
 
         Member member = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(member);
+
         Post post = postService.findById(1).get();
 
         LocalDateTime oldModifyDate = post.getModifyDate();
@@ -188,7 +192,7 @@ public class ApiV1PostControllerTest {
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/1")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                                 .content("""
                                         {
                                             "title" : "제목 new",
@@ -223,11 +227,12 @@ public class ApiV1PostControllerTest {
     void t7() throws Exception {
 
         Member member = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(member);
 
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/1")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                                 .content("""
                                         {
                                             "title" : "",
@@ -279,11 +284,12 @@ public class ApiV1PostControllerTest {
     void t9() throws Exception {
 
         Member member = memberService.findByUsername("user2").get();
+        String accessToken = memberService.genAccessToken(member);
 
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/1")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                                 .content("""
                                         {
                                             "title" : "제목 new",
@@ -306,11 +312,12 @@ public class ApiV1PostControllerTest {
     @DisplayName("글 삭제")
     void t10() throws Exception {
         Member member = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(member);
 
         mvc
                 .perform(
                         delete("/api/v1/posts/1")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1PostController.class))
@@ -326,11 +333,12 @@ public class ApiV1PostControllerTest {
     @DisplayName("글 삭제, with not existing post id")
     void t11() throws Exception {
         Member member = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(member);
 
         mvc
                 .perform(
                         delete("/api/v1/posts/1000000")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1PostController.class))
@@ -357,11 +365,12 @@ public class ApiV1PostControllerTest {
     @DisplayName("글 삭제, with no permission")
     void t13() throws Exception {
         Member member = memberService.findByUsername("user2").get();
+        String accessToken = memberService.genAccessToken(member);
 
         mvc
                 .perform(
                         delete("/api/v1/posts/1")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1PostController.class))
@@ -375,11 +384,12 @@ public class ApiV1PostControllerTest {
     @DisplayName("비공개글 6번글 조회, with 작성자")
     void t14() throws Exception {
         Member member = memberService.findByUsername("user4").get();
+        String accessToken = memberService.genAccessToken(member);
 
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts/6")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print());
 
@@ -417,11 +427,12 @@ public class ApiV1PostControllerTest {
     @DisplayName("비공개글 6번글 조회, with no permission")
     void t16() throws Exception {
         Member member = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(member);
 
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts/6")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print());
 
@@ -552,11 +563,12 @@ public class ApiV1PostControllerTest {
     void t20() throws Exception {
 
         Member author = memberService.findByUsername("user4").get();
+        String accessToken = memberService.genAccessToken(author);
 
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts/mine?page=1&pageSize=3")
-                                .header("Authorization", "Bearer " + author.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print());
 
@@ -594,11 +606,12 @@ public class ApiV1PostControllerTest {
     void t21() throws Exception {
 
         Member author = memberService.findByUsername("user4").get();
+        String accessToken = memberService.genAccessToken(author);
 
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts/mine?page=1&pageSize=3&searchKeyword=수영")
-                                .header("Authorization", "Bearer " + author.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print());
 
@@ -635,11 +648,12 @@ public class ApiV1PostControllerTest {
     @DisplayName("내글, 다건 조회 with searchKeyword=16")
     void t22() throws Exception {
         Member author = memberService.findByUsername("user4").get();
+        String accessToken = memberService.genAccessToken(author);
 
         ResultActions resultActions = mvc
                 .perform(
                         get("/api/v1/posts/mine?page=1&pageSize=3&searchKeywordType=content&searchKeyword=16")
-                                .header("Authorization", "Bearer " + author.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print());
 

@@ -152,7 +152,8 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.item.createDate").value(Matchers.startsWith(member.getCreateDate().toString().substring(0, 10))))
                 .andExpect(jsonPath("$.data.item.modifyDate").value(Matchers.startsWith(member.getModifyDate().toString().substring(0, 10))))
                 .andExpect(jsonPath("$.data.item.nickname").value(member.getNickname()))
-                .andExpect(jsonPath("$.data.apiKey").value(member.getApiKey()));
+                .andExpect(jsonPath("$.data.apiKey").value(member.getApiKey()))
+                .andExpect(jsonPath("$.data.accessToken").exists());
     }
 
     @Test
@@ -252,11 +253,12 @@ public class ApiV1MemberControllerTest {
     void t9() throws Exception {
 
         Member member = memberService.findByUsername("user1").get();
+        String accessToken = memberService.genAccessToken(member);
 
         mvc
                 .perform(
                         get("/api/v1/members/me")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1MemberController.class))
@@ -273,11 +275,12 @@ public class ApiV1MemberControllerTest {
     @DisplayName("내정보, with user2")
     void t10() throws Exception {
         Member member = memberService.findByUsername("user2").get();
+        String accessToken = memberService.genAccessToken(member);
 
         mvc
                 .perform(
                         get("/api/v1/members/me")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1MemberController.class))

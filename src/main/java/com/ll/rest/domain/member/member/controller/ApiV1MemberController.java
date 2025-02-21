@@ -2,6 +2,7 @@ package com.ll.rest.domain.member.member.controller;
 
 import com.ll.rest.domain.member.member.dto.MemberDto;
 import com.ll.rest.domain.member.member.entity.Member;
+import com.ll.rest.domain.member.member.service.AuthTokenService;
 import com.ll.rest.domain.member.member.service.MemberService;
 import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rq.Rq;
@@ -49,7 +50,8 @@ public class ApiV1MemberController {
 
     record MemberLoginResBody(
             MemberDto item,
-            String apiKey
+            String apiKey,
+            String accessToken
     ) {
     }
 
@@ -61,12 +63,15 @@ public class ApiV1MemberController {
         if (!member.matchPassword(reqBody.password))
             throw new ServiceException("401-2", "비밀번호가 맞지 않습니다.");
 
+        String accessToken = memberService.genAccessToken(member);
+
         return new RsData<>(
                 "200-1",
                 "%s님 환영합니다.".formatted(member.getNickname()),
                 new MemberLoginResBody(
                         new MemberDto(member),
-                        member.getApiKey()
+                        member.getApiKey(),
+                        accessToken
                 )
         );
     }

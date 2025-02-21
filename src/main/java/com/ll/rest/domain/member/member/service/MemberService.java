@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class MemberService {
     
     private final MemberRepository memberRepository;
+    private final AuthTokenService authTokenService;
     
     public long count() {
         return memberRepository.count();
@@ -49,4 +51,17 @@ public class MemberService {
         return memberRepository.findByApiKey(apiKey);
     }
 
+    public String genAccessToken(Member member) {
+        return authTokenService.genAccessToken(member);
+    }
+
+    public Member getMemberFromAccessToken(String accessToken) {
+        Map<String, Object> payload = authTokenService.payload(accessToken);
+
+        if (payload == null) return null;
+
+        Member member = new Member((long) payload.get("id"), (String) payload.get("username"));
+
+        return member;
+    }
 }

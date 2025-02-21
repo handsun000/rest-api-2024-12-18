@@ -74,11 +74,12 @@ public class ApiV1PostCommentControllerTest {
     void t2() throws Exception {
 
         Member member = memberService.findByUsername("user2").get();
+        String accessToken = memberService.genAccessToken(member);
 
         ResultActions resultActions = mvc
                 .perform(
                         delete("/api/v1/posts/1/comments/1")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1PostCommentController.class))
@@ -93,11 +94,12 @@ public class ApiV1PostCommentControllerTest {
     void t3() throws Exception {
 
         Member member = memberService.findByUsername("user2").get();
+        String accessToken = memberService.genAccessToken(member);
 
         ResultActions resultActions = mvc
                 .perform(
                         put("/api/v1/posts/1/comments/1")
-                                .header("Authorization", "Bearer " + member.getApiKey())
+                                .header("Authorization", "Bearer " + accessToken)
                                 .content("""
                                             {
                                                 "content" : "내용 new"
