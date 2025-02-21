@@ -129,7 +129,7 @@ public class ApiV1PostController {
             @PathVariable long id,
             @RequestBody @Valid PostModifyReqBody reqBody
     ) {
-        Member member = rq.getActor();
+Member member = rq.getActor();
         Post post = postService.findById(id).get();
 
         post.checkActorCanModify(member);
