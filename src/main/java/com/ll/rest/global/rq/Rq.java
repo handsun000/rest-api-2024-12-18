@@ -43,14 +43,16 @@ public class Rq {
     }
 
     public Member getActor() {
-        SecurityContext context = SecurityContextHolder.getContext();
-
-        Authentication authentication = context.getAuthentication();
-
-        if (authentication == null || authentication.getPrincipal() == null || authentication.getPrincipal() instanceof String) return null;
-
-        UserDetails user = (UserDetails) authentication.getPrincipal();
-        String username = user.getUsername();
-        return memberService.findByUsername(username).get();
+        return Optional.ofNullable(
+                        SecurityContextHolder
+                                .getContext()
+                                .getAuthentication()
+                )
+                .map(Authentication::getPrincipal)
+                .filter(principal -> principal instanceof UserDetails)
+                .map(principal -> (UserDetails) principal)
+                .map(UserDetails::getUsername)
+                .flatMap(memberService::findByUsername)
+                .orElse(null);
     }
 }

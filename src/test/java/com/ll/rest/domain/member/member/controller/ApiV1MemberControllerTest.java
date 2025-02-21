@@ -253,12 +253,12 @@ public class ApiV1MemberControllerTest {
     void t9() throws Exception {
 
         Member member = memberService.findByUsername("user1").get();
-        String accessToken = memberService.genAccessToken(member);
+        String authToken = memberService.genAuthToken(member);
 
         mvc
                 .perform(
                         get("/api/v1/members/me")
-                                .header("Authorization", "Bearer " + accessToken)
+                                .header("Authorization", "Bearer " + authToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1MemberController.class))
@@ -275,12 +275,12 @@ public class ApiV1MemberControllerTest {
     @DisplayName("내정보, with user2")
     void t10() throws Exception {
         Member member = memberService.findByUsername("user2").get();
-        String accessToken = memberService.genAccessToken(member);
+        String authToken = memberService.genAuthToken(member);
 
         mvc
                 .perform(
                         get("/api/v1/members/me")
-                                .header("Authorization", "Bearer " + accessToken)
+                                .header("Authorization", "Bearer " + authToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1MemberController.class))
