@@ -3,6 +3,7 @@ package com.ll.rest.global.rq;
 import com.ll.rest.domain.member.member.entity.Member;
 import com.ll.rest.domain.member.member.service.MemberService;
 import com.ll.rest.global.exception.ServiceException;
+import com.ll.rest.global.security.SecurityUser;
 import com.ll.rest.standard.util.Ut;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,10 @@ public class Rq {
     private final HttpServletRequest request;
     private final MemberService memberService;
 
-    public void setLogin(String username) {
-        UserDetails user = new User(
-                username,
+    public void setLogin(Member member) {
+        UserDetails user = new SecurityUser(
+                member.getId(),
+                member.getUsername(),
                 "",
                 List.of()
         );
