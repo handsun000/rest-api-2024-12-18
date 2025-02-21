@@ -73,11 +73,13 @@ public class AuthTokenServiceTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Ut.jwt.toString 를 통해서 JWT 생성, {name=\"Paul\", age=23}")
     void t3() {
-        String jwt = Ut.jwt.toString(secret, expireSeconds, Map.of("name", "Paul", "age", "23"));
+        String jwtStr = Ut.jwt.toString(secret, expireSeconds, Map.of("name", "Paul", "age", "23"));
 
-        assertThat(jwt).isNotBlank();
+        assertThat(jwtStr).isNotBlank();
+
+        assertThat(Ut.jwt.isValid(secret, jwtStr)).isTrue();
     }
 
     @Test
