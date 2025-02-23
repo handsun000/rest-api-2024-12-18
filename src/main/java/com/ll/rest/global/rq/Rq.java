@@ -32,7 +32,7 @@ public class Rq {
                 member.getId(),
                 member.getUsername(),
                 "",
-                List.of()
+                member.getAuthorities()
         );
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
