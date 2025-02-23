@@ -310,14 +310,11 @@ public class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 삭제")
+    @WithUserDetails("user1")
     void t10() throws Exception {
-        Member member = memberService.findByUsername("user1").get();
-        String authToken = memberService.genAuthToken(member);
-
         mvc
                 .perform(
                         delete("/api/v1/posts/1")
-                                .header("Authorization", "Bearer " + authToken)
                 )
                 .andDo(print())
                 .andExpect(handler().handlerType(ApiV1PostController.class))

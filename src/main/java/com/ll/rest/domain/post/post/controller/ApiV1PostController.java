@@ -10,23 +10,12 @@ import com.ll.rest.global.exception.ServiceException;
 import com.ll.rest.global.rq.Rq;
 import com.ll.rest.global.rsData.RsData;
 import com.ll.rest.standard.page.dto.PageDto;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jdk.jfr.Frequency;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -35,6 +24,27 @@ public class ApiV1PostController {
 
     private final PostService postService;
     private final Rq rq;
+
+    record PostStatisticResBody(
+            long totalPostCount,
+            long totalPublishedPostCount,
+            long totalListedPostCount
+    ) {
+    }
+
+    @GetMapping("/statistics")
+    @Transactional(readOnly = true)
+    public PostStatisticResBody statistic() {
+
+        Member member = rq.getActor();
+
+        if (!member.isAdmin()) throw new ServiceException("403-1", "관리자만 접근 가능합니다.");
+
+        return new PostStatisticResBody(
+                10,
+                10,
+                10);
+    }
 
     @GetMapping("/mine")
     public PageDto<PostDto> mine(
@@ -98,7 +108,7 @@ public class ApiV1PostController {
     @PostMapping
     public RsData<PostWithContentDto> write(
             @RequestBody @Valid PostWriteReqBody reqBody
-            ) {
+    ) {
 
         Member member = rq.getActor();
 
@@ -129,7 +139,7 @@ public class ApiV1PostController {
             @PathVariable long id,
             @RequestBody @Valid PostModifyReqBody reqBody
     ) {
-Member member = rq.getActor();
+        Member member = rq.getActor();
         Post post = postService.findById(id).get();
 
         post.checkActorCanModify(member);
