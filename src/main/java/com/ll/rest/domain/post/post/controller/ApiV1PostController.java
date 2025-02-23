@@ -38,8 +38,6 @@ public class ApiV1PostController {
 
         Member member = rq.getActor();
 
-        if (!member.isAdmin()) throw new ServiceException("403-1", "관리자만 접근 가능합니다.");
-
         return new PostStatisticResBody(
                 10,
                 10,
