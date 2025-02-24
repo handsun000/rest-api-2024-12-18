@@ -56,7 +56,7 @@ public class MemberService {
     }
 
     public String genAuthToken(Member member) {
-        return genAccessToken(member);
+        return member.getApiKey() + " " + genAccessToken(member);
     }
 
 
