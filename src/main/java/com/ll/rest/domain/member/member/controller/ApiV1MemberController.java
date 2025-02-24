@@ -87,4 +87,15 @@ public class ApiV1MemberController {
 
         return new MemberDto(member);
     }
+
+    @DeleteMapping("/logout")
+    public RsData<Void> logout() {
+        rq.deleteCookie("accessToken");
+        rq.deleteCookie("apiKey");
+
+        return new RsData<>(
+                "200-1",
+                "로그아웃 되었습니다."
+        );
+    }
 }

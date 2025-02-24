@@ -98,4 +98,17 @@ public class Rq {
 
         return memberService.findById(actor.getId());
     }
+
+    public void deleteCookie(String key) {
+        ResponseCookie cookie = ResponseCookie.from(key, null)
+                .path("/")
+                .domain("localhost")
+                .sameSite("Strict")
+                .secure(true)
+                .httpOnly(true)
+                .maxAge(0)
+                .build();
+
+        response.addHeader("Set-Cookie", cookie.toString());
+    }
 }
