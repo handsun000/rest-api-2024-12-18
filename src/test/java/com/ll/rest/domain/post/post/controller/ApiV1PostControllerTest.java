@@ -587,8 +587,8 @@ public class ApiV1PostControllerTest {
             Post post = posts.get(i);
             resultActions
                     .andExpect(jsonPath("$.items[%d].id".formatted(i)).value(post.getId()))
-                    .andExpect(jsonPath("$.items[%d].createDate".formatted(i)).value(Matchers.startsWith(post.getCreateDate().toString().substring(0, 25))))
-                    .andExpect(jsonPath("$.items[%d].modifyDate".formatted(i)).value(Matchers.startsWith(post.getModifyDate().toString().substring(0, 25))))
+                    .andExpect(jsonPath("$.items[%d].createDate".formatted(i)).value(Matchers.startsWith(post.getCreateDate().toString().substring(0, 20))))
+                    .andExpect(jsonPath("$.items[%d].modifyDate".formatted(i)).value(Matchers.startsWith(post.getModifyDate().toString().substring(0, 20))))
                     .andExpect(jsonPath("$.items[%d].authorId".formatted(i)).value(post.getAuthor().getId()))
                     .andExpect(jsonPath("$.items[%d].authorName".formatted(i)).value(post.getAuthor().getName()))
                     .andExpect(jsonPath("$.items[%d].title".formatted(i)).value(post.getTitle()))

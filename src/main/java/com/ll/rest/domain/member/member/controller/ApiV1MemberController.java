@@ -82,7 +82,7 @@ public class ApiV1MemberController {
     @GetMapping("/me")
     public MemberDto me() {
 
-        Member member = memberService.findById(rq.getActor().getId()).get();
+        Member member = rq.findByActor().get();
 
 
         return new MemberDto(member);

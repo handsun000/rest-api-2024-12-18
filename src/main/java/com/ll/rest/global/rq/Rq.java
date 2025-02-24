@@ -1,6 +1,7 @@
 package com.ll.rest.global.rq;
 
 import com.ll.rest.domain.member.member.entity.Member;
+import com.ll.rest.domain.member.member.service.MemberService;
 import com.ll.rest.global.security.SecurityUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,6 +26,7 @@ public class Rq {
 
     private final HttpServletResponse response;
     private final HttpServletRequest request;
+    private final MemberService memberService;
 
     public void setLogin(Member member) {
         UserDetails user = new SecurityUser(
@@ -87,5 +89,13 @@ public class Rq {
 
     public String getHeader(String key) {
         return request.getHeader(key);
+    }
+
+    public Optional<Member> findByActor() {
+        Member actor = getActor();
+
+        if (actor == null) return Optional.empty();
+
+        return memberService.findById(actor.getId());
     }
 }

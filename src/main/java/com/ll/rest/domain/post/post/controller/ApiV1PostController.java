@@ -108,7 +108,7 @@ public class ApiV1PostController {
             @RequestBody @Valid PostWriteReqBody reqBody
     ) {
 
-        Member member = rq.getActor();
+        Member member = rq.findByActor().get();
 
         Post post = postService.write(member, reqBody.title, reqBody.content, reqBody.published, reqBody.listed);
 

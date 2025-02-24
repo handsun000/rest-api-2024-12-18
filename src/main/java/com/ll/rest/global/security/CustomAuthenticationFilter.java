@@ -83,17 +83,17 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             Optional<Member> opMemberByApiKey = memberService.findByApiKey(tokens.apiKey);
             if (opMemberByApiKey.isPresent()) {
                 member = opMemberByApiKey.get();
-                updateAuthorizationHeader(tokens.apiKey, member);
+                updateAuthorizationHeader(member);
             }
         }
 
         return member;
     }
 
-    private void updateAuthorizationHeader(String apiKey, Member member) {
+    private void updateAuthorizationHeader(Member member) {
         String newAccessToken = memberService.genAccessToken(member);
 
-        rq.setHeader("Authorization", "Bearer " + apiKey + " " + newAccessToken);
+        rq.setHeader("Authorization", "Bearer " + member.getApiKey() + " " + newAccessToken);
         rq.setCookie("accessToken", newAccessToken);
     }
 }
