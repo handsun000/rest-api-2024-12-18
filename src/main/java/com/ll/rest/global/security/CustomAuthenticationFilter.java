@@ -22,6 +22,8 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
     private final Rq rq;
     private final MemberService memberService;
 
+    record AuthTokens(String apiKey, String accessToken) {}
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (!isApiRequest(request)) {
@@ -34,18 +36,16 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        Optional<AuthenticationTokens> tokens = extractTokens(request);
+        Optional<AuthTokens> tokens = extractTokens(request);
         if (tokens.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        AuthenticationTokens authTokens = tokens.get();
+        AuthTokens authTokens = tokens.get();
         Member member = authenticateMember(authTokens);
 
-        if (member != null) {
-            rq.setLogin(member);
-        }
+        if (member != null) rq.setLogin(member);
 
         filterChain.doFilter(request, response);
     }
@@ -54,7 +54,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         return request.getRequestURI().startsWith("/api/");
     }
 
-    private Optional<AuthenticationTokens> extractTokens(HttpServletRequest request) {
+    private Optional<AuthTokens> extractTokens(HttpServletRequest request) {
         String apiKey = null;
         String accessToken = null;
 
@@ -73,10 +73,10 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return (apiKey != null && accessToken != null) ?
-                Optional.of(new AuthenticationTokens(apiKey, accessToken)) : Optional.empty();
+                Optional.of(new AuthTokens(apiKey, accessToken)) : Optional.empty();
     }
 
-    private Member authenticateMember(AuthenticationTokens tokens) {
+    private Member authenticateMember(AuthTokens tokens) {
         Member member = memberService.getMemberFromAccessToken(tokens.accessToken);
 
         if (member == null) {
@@ -95,15 +95,5 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
         rq.setHeader("Authorization", "Bearer " + apiKey + " " + newAccessToken);
         rq.setCookie("accessToken", newAccessToken);
-    }
-
-    private static class AuthenticationTokens {
-        final String apiKey;
-        final String accessToken;
-
-        AuthenticationTokens(String apiKey, String accessToken) {
-            this.apiKey = apiKey;
-            this.accessToken = accessToken;
-        }
     }
 }
