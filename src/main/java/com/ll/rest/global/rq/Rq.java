@@ -84,4 +84,8 @@ public class Rq {
     public void setHeader(String key, String value) {
         response.setHeader(key, value);
     }
+
+    public String getHeader(String key) {
+        return request.getHeader(key);
+    }
 }

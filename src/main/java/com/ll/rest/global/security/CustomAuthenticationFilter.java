@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -23,20 +24,43 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (!request.getRequestURI().startsWith("/api/")) {
+        if (!isApiRequest(request)) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        if (List.of("/api/v1/members/login", "/api/v1/members/logout", "/api/v1/members/join").contains(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        Optional<AuthenticationTokens> tokens = extractTokens(request);
+        if (tokens.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        AuthenticationTokens authTokens = tokens.get();
+        Member member = authenticateMember(authTokens);
+
+        if (member != null) {
+            rq.setLogin(member);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private boolean isApiRequest(HttpServletRequest request) {
+        return request.getRequestURI().startsWith("/api/");
+    }
+
+    private Optional<AuthenticationTokens> extractTokens(HttpServletRequest request) {
         String apiKey = null;
         String accessToken = null;
 
-        String authorization = request.getHeader("Authorization");
-
+        String authorization = rq.getHeader("Authorization");
         if (authorization != null && authorization.startsWith("Bearer ")) {
-            String token = authorization.substring("Bearer ".length());
-            String[] tokenBits = token.split(" ", 2);
-
+            String[] tokenBits = authorization.substring("Bearer ".length()).split(" ", 2);
             if (tokenBits.length == 2) {
                 apiKey = tokenBits[0];
                 accessToken = tokenBits[1];
@@ -48,31 +72,38 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             accessToken = rq.getCookieValue("accessToken");
         }
 
-        if (apiKey == null || accessToken == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        return (apiKey != null && accessToken != null) ?
+                Optional.of(new AuthenticationTokens(apiKey, accessToken)) : Optional.empty();
+    }
 
-        Member member = memberService.getMemberFromAccessToken(accessToken);
+    private Member authenticateMember(AuthenticationTokens tokens) {
+        Member member = memberService.getMemberFromAccessToken(tokens.accessToken);
 
         if (member == null) {
-            Optional<Member> opMemberByApiKey = memberService.findByApiKey(apiKey);
-
-            if (opMemberByApiKey.isEmpty()) {
-                filterChain.doFilter(request, response);
-                return;
+            Optional<Member> opMemberByApiKey = memberService.findByApiKey(tokens.apiKey);
+            if (opMemberByApiKey.isPresent()) {
+                member = opMemberByApiKey.get();
+                updateAuthorizationHeader(tokens.apiKey, member);
             }
-
-            member = opMemberByApiKey.get();
-
-            String newAccessToken = memberService.genAccessToken(member);
-
-            rq.setHeader("Authorization", "Bearer " + apiKey + " " + newAccessToken);
-            rq.setCookie("accessToken", newAccessToken);
         }
 
-        rq.setLogin(member);
+        return member;
+    }
 
-        filterChain.doFilter(request, response);
+    private void updateAuthorizationHeader(String apiKey, Member member) {
+        String newAccessToken = memberService.genAccessToken(member);
+
+        rq.setHeader("Authorization", "Bearer " + apiKey + " " + newAccessToken);
+        rq.setCookie("accessToken", newAccessToken);
+    }
+
+    private static class AuthenticationTokens {
+        final String apiKey;
+        final String accessToken;
+
+        AuthenticationTokens(String apiKey, String accessToken) {
+            this.apiKey = apiKey;
+            this.accessToken = accessToken;
+        }
     }
 }
